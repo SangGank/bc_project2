@@ -72,7 +72,7 @@ def compute_metrics(pred):
 
 def label_to_num(label):
   num_label = []
-  with open('dict_label_to_num.pkl', 'rb') as f:
+  with open('./code/dict_label_to_num.pkl', 'rb') as f:
     dict_label_to_num = pickle.load(f)
   for v in label:
     num_label.append(dict_label_to_num[v])
@@ -87,8 +87,8 @@ def train():
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
   # load dataset
-  train_dataset = load_data("../dataset/train/train_sample.csv")
-  dev_dataset = load_data("../dataset/train/dev_sample.csv") # validation용 데이터는 따로 만드셔야 합니다.
+  train_dataset = load_data("./data/dataset/train/train_sample.csv")
+  dev_dataset = load_data("./data/dataset/train/dev_sample.csv") # validation용 데이터는 따로 만드셔야 합니다.
 
   train_label = label_to_num(train_dataset['label'].values)
   dev_label = label_to_num(dev_dataset['label'].values)
@@ -119,7 +119,7 @@ def train():
     output_dir='./results',          # output directory
     save_total_limit=5,              # number of total save model.
     save_steps=500,                 # model saving step.
-    num_train_epochs=20,              # total number of training epochs
+    num_train_epochs=10,              # total number of training epochs
     learning_rate=5e-5,               # learning_rate
     per_device_train_batch_size=16,  # batch size per device during training
     per_device_eval_batch_size=16,   # batch size for evaluation
