@@ -10,6 +10,10 @@ from load_data import *
 import numpy as np
 import random
 
+os.environ['WANDB_PROJECT'] = 'project2'
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"
+wandb_name = 'start'
+
 def set_seed(seed:int = 42):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -128,7 +132,9 @@ def train():
                                 # `steps`: Evaluate every `eval_steps`.
                                 # `epoch`: Evaluate every end of epoch.
     eval_steps = 500,            # evaluation step.
-    load_best_model_at_end = True 
+    load_best_model_at_end = True,
+    report_to="wandb",
+    run_name=wandb_name
   )
   trainer = Trainer(
     model=model,                         # the instantiated 🤗 Transformers model to be trained
