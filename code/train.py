@@ -12,7 +12,8 @@ import random
 
 os.environ['WANDB_PROJECT'] = 'project2'
 os.environ["WANDB_LOG_MODEL"] = "checkpoint"
-wandb_name = 'start'
+file_name = os.path.basename(__file__).split('.')[0]
+wandb_name = file_name
 
 def set_seed(seed:int = 42):
     torch.manual_seed(seed)
@@ -142,7 +143,7 @@ def train():
     train_dataset=RE_train_dataset,         # training dataset
     eval_dataset=RE_dev_dataset,             # evaluation dataset
     compute_metrics=compute_metrics,         # define metrics function
-    callbacks = [EarlyStoppingCallback(early_stopping_patience=4)]
+    # callbacks = [EarlyStoppingCallback(early_stopping_patience=4)]
     
   )
 
