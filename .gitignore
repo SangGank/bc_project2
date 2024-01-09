@@ -190,5 +190,7 @@ pyrightconfig.json
 data/
 results/
 wandb/
+prediction/
+best_model/
 *.csv
 # End of https://www.toptal.com/developers/gitignore/api/linux,python
