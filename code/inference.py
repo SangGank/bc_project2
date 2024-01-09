@@ -12,6 +12,8 @@ from tqdm import tqdm
 
 from train import set_seed
 
+file_name = 'train_dataEqual'
+
 def inference(model, tokenized_sent, device):
   """
     test dataset을 DataLoader로 만들어 준 후,
@@ -43,7 +45,7 @@ def num_to_label(label):
     숫자로 되어 있던 class를 원본 문자열 라벨로 변환 합니다.
   """
   origin_label = []
-  with open('dict_num_to_label.pkl', 'rb') as f:
+  with open('./code/dict_num_to_label.pkl', 'rb') as f:
     dict_num_to_label = pickle.load(f)
   for v in label:
     origin_label.append(dict_num_to_label[v])
@@ -73,12 +75,13 @@ def main(args):
 
   ## load my model
   MODEL_NAME = args.model_dir # model dir.
+  print(MODEL_NAME)
   model = AutoModelForSequenceClassification.from_pretrained(args.model_dir)
   model.parameters
   model.to(device)
 
   ## load test datset
-  test_dataset_dir = "../dataset/test/test_data.csv"
+  test_dataset_dir = "./data/dataset/test/test_data.csv"
   test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
   Re_test_dataset = RE_Dataset(test_dataset ,test_label)
 
@@ -91,14 +94,14 @@ def main(args):
   # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
   output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
 
-  output.to_csv('./prediction/submission.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+  output.to_csv(f'./code/prediction/{file_name}.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
   #### 필수!! ##############################################
   print('---- Finish! ----')
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   
   # model dir
-  parser.add_argument('--model_dir', type=str, default="./best_model")
+  parser.add_argument('--model_dir', type=str, default=f"./best_model/{file_name}")
   args = parser.parse_args()
   print(args)
   main(args)
