@@ -193,4 +193,5 @@ wandb/
 prediction/
 best_model/
 *.csv
+a.py
 # End of https://www.toptal.com/developers/gitignore/api/linux,python
