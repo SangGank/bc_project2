@@ -88,8 +88,8 @@ def train():
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
   # load dataset
-  train_dataset = load_data("./data/dataset/train/train_sample.csv")
-  dev_dataset = load_data("./data/dataset/train/dev_sample.csv") # validation용 데이터는 따로 만드셔야 합니다.
+  train_dataset = load_data("./data/dataset/train/train_equal.csv")
+  dev_dataset = load_data("./data/dataset/train/dev_equal.csv") # validation용 데이터는 따로 만드셔야 합니다.
 
   train_label = label_to_num(train_dataset['label'].values)
   dev_label = label_to_num(dev_dataset['label'].values)
@@ -119,7 +119,7 @@ def train():
   training_args = TrainingArguments(
     output_dir=f'./code/results/{wandb_name}',          # output directory
     save_total_limit=5,              # number of total save model.
-    save_steps=500,                 # model saving step.
+    save_steps=1000,                 # model saving step.
     num_train_epochs=10,              # total number of training epochs
     learning_rate=5e-5,               # learning_rate
     per_device_train_batch_size=16,  # batch size per device during training
@@ -143,7 +143,7 @@ def train():
     train_dataset=RE_train_dataset,         # training dataset
     eval_dataset=RE_dev_dataset,             # evaluation dataset
     compute_metrics=compute_metrics,         # define metrics function
-    # callbacks = [EarlyStoppingCallback(early_stopping_patience=4)]
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=4)]
     
   )
 
