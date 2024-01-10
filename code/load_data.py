@@ -77,14 +77,13 @@ def tokenized_dataset(dataset, tokenizer):
                                                                   dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
   # dataset['sentence'] = dataset['id'].apply(lambda x: re.sub(rf'{dataset.subject_entity.loc[x]}',f'<{dataset.subject_type.loc[x]}>',dataset.sentence.loc[x]))
   # dataset['sentence'] = dataset['id'].apply(lambda x: re.sub(rf'{dataset.object_entity.loc[x]}',f'<{dataset.object_type.loc[x]}>',dataset.sentence.loc[x]))
-  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
   tokenized_sentences = tokenizer(
       concat_entity,
       list(dataset['sentence']),
       return_tensors="pt",
       padding=True,
       truncation=True,
-      max_length=256,
+      max_length=512,
       add_special_tokens=True,
       )
   return tokenized_sentences

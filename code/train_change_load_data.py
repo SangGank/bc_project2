@@ -88,8 +88,8 @@ def train():
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
   # load dataset
-  train_dataset = load_data("./data/dataset/train/train_sample.csv")
-  dev_dataset = load_data("./data/dataset/train/dev_sample.csv") # validation용 데이터는 따로 만드셔야 합니다.
+  train_dataset = load_data("./data/dataset/train/train_norel_half_arg.csv")
+  dev_dataset = load_data("./data/dataset/train/dev_norel_half_arg.csv") # validation용 데이터는 따로 만드셔야 합니다.
 
   train_label = label_to_num(train_dataset['label'].values)
   dev_label = label_to_num(dev_dataset['label'].values)
@@ -122,8 +122,8 @@ def train():
     save_steps=500,                 # model saving step.
     num_train_epochs=10,              # total number of training epochs
     learning_rate=5e-5,               # learning_rate
-    per_device_train_batch_size=16,  # batch size per device during training
-    per_device_eval_batch_size=16,   # batch size for evaluation
+    per_device_train_batch_size=32,  # batch size per device during training
+    per_device_eval_batch_size=32,   # batch size for evaluation
     warmup_steps=500,                # number of warmup steps for learning rate scheduler
     weight_decay=0.01,               # strength of weight decay
     logging_dir='./logs',            # directory for storing logs
@@ -135,9 +135,7 @@ def train():
     eval_steps = 500,            # evaluation step.
     load_best_model_at_end = True,
     report_to="wandb",
-    run_name=wandb_name,
-    metric_for_best_model = 'micro f1 score'
-
+    run_name=wandb_name
   )
   trainer = Trainer(
     model=model,                         # the instantiated 🤗 Transformers model to be trained

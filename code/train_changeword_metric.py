@@ -86,10 +86,11 @@ def train():
   # MODEL_NAME = "bert-base-uncased"
   MODEL_NAME = "klue/bert-base"
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
 
   # load dataset
-  train_dataset = load_data("./data/dataset/train/train_sample.csv")
-  dev_dataset = load_data("./data/dataset/train/dev_sample.csv") # validation용 데이터는 따로 만드셔야 합니다.
+  train_dataset = load_data("./data/dataset/train/train_norel_0.3_arg_equal.csv")
+  dev_dataset = load_data("./data/dataset/train/dev_norel_0.3_arg_equal.csv") # validation용 데이터는 따로 만드셔야 합니다.
 
   train_label = label_to_num(train_dataset['label'].values)
   dev_label = label_to_num(dev_dataset['label'].values)
@@ -110,6 +111,7 @@ def train():
   model_config.num_labels = 30
 
   model =  AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, config=model_config)
+  model.resize_token_embeddings(len(tokenizer))
   print(model.config)
   model.parameters
   model.to(device)
@@ -119,7 +121,7 @@ def train():
   training_args = TrainingArguments(
     output_dir=f'./code/results/{wandb_name}',          # output directory
     save_total_limit=5,              # number of total save model.
-    save_steps=500,                 # model saving step.
+    save_steps=1000,                 # model saving step.
     num_train_epochs=10,              # total number of training epochs
     learning_rate=5e-5,               # learning_rate
     per_device_train_batch_size=16,  # batch size per device during training
@@ -132,7 +134,7 @@ def train():
                                 # `no`: No evaluation during training.
                                 # `steps`: Evaluate every `eval_steps`.
                                 # `epoch`: Evaluate every end of epoch.
-    eval_steps = 500,            # evaluation step.
+    eval_steps = 1000,            # evaluation step.
     load_best_model_at_end = True,
     report_to="wandb",
     run_name=wandb_name,
