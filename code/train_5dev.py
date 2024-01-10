@@ -141,17 +141,33 @@ def train():
   skf = StratifiedKFold(n_splits=6,shuffle=True, random_state=42)
   
   # load dataset
-  dataset = load_data("./data/dataset/train/no_half_train.csv")
-  # dev_dataset = load_data("./data/dataset/train/dev_norel_0.3_arg_equal.csv") # validation용 데이터는 따로 만드셔야 합니다.
-  for train_index, valid_index in skf.split(dataset, dataset['label']):  
-    train_dataset, dev_dataset = dataset.iloc[train_index],dataset.iloc[valid_index]
+  # dataset = load_data("./data/dataset/train/no_half_train.csv")
+  # # dev_dataset = load_data("./data/dataset/train/dev_norel_0.3_arg_equal.csv") # validation용 데이터는 따로 만드셔야 합니다.
+  
+  # load dataset
+  train_dataset = load_data("./data/dataset/train/train_norel_0.3_arg.csv")
+
+  train_label = label_to_num(train_dataset['label'].values)
+  tokenized_train = tokenized_dataset(train_dataset, tokenizer)
 
 
-    train_label = label_to_num(train_dataset['label'].values)
+  dev_dataset_pre = load_data("./data/dataset/train/dev_norel_0.3_arg.csv") # validation용 데이터는 따로 만드셔야 합니다.
+
+  dev_size = len(dev_dataset_pre)
+  num = 5
+
+  unit_size= dev_size//num
+  # print(num)
+  
+  for i in range(num):  
+    # train_dataset, dev_dataset = dataset.iloc[train_index],dataset.iloc[valid_index]
+    start = i*unit_size
+    dev_dataset = dev_dataset_pre.iloc[start:start+unit_size]
+
+
     dev_label = label_to_num(dev_dataset['label'].values)
 
     # tokenizing dataset
-    tokenized_train = tokenized_dataset(train_dataset, tokenizer)
     tokenized_dev = tokenized_dataset(dev_dataset, tokenizer)
 
     # make dataset for pytorch.
