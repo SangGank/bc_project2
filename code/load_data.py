@@ -2,6 +2,7 @@ import pickle as pickle
 import os
 import pandas as pd
 import torch
+import re
 
 
 class RE_Dataset(torch.utils.data.Dataset):
@@ -22,17 +23,27 @@ def preprocessing_dataset(dataset):
   """ 처음 불러온 csv 파일을 원하는 형태의 DataFrame으로 변경 시켜줍니다."""
   subject_entity = []
   object_entity = []
+  subject_type= []
+  object_type= []
   for i,j in zip(dataset['subject_entity'], dataset['object_entity']):
     # i = i[1:-1].split(',')[0].split(':')[1]
-    i=eval(i)['word']
-
+    sub_entity = eval(i)
+    ob_entity = eval(j)
+    sub_word= sub_entity['word']
+    sub_type = sub_entity['type']
     # j = j[1:-1].split(',')[0].split(':')[1]
-    j=eval(j)['word']
+    ob_word = ob_entity['word']
+    ob_type = ob_entity['type']
 
 
-    subject_entity.append(i)
-    object_entity.append(j)
-  out_dataset = pd.DataFrame({'id':dataset['id'], 'sentence':dataset['sentence'],'subject_entity':subject_entity,'object_entity':object_entity,'label':dataset['label'],})
+    subject_entity.append(sub_word)
+    object_entity.append(ob_word)
+    subject_type.append(sub_type)
+    object_type.append(ob_type)
+  
+  out_dataset = pd.DataFrame({'id':dataset['id'], 'sentence':dataset['sentence'],'subject_entity':subject_entity,'object_entity':object_entity,'label':dataset['label'],
+                              'subject_type' : subject_type, 'object_type': object_type})
+  out_dataset.id = out_dataset.index
   # print(out_dataset)
   return out_dataset
 
@@ -44,6 +55,16 @@ def load_data(dataset_dir):
   return dataset
 
 
+
+def change_word(sentence, sub_word, sub_type , ob_word, ob_type):
+  sentence = re.sub(rf'{sub_word}',f'<{sub_type}>',sentence)
+  sentence = re.sub(rf'{ob_word}',f'<{ob_type}>',sentence)
+
+  return sentence
+
+
+
+
 def tokenized_dataset(dataset, tokenizer):
   """ tokenizer에 따라 sentence를 tokenizing 합니다."""
   concat_entity = []
@@ -51,6 +72,12 @@ def tokenized_dataset(dataset, tokenizer):
     temp = ''
     temp = e01 + '[SEP]' + e02
     concat_entity.append(temp)
+  # print(dataset.head())
+  dataset['sentence'] = dataset['id'].apply(lambda x: change_word(dataset.sentence.loc[x],dataset.subject_entity.loc[x],
+                                                                  dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
+  # dataset['sentence'] = dataset['id'].apply(lambda x: re.sub(rf'{dataset.subject_entity.loc[x]}',f'<{dataset.subject_type.loc[x]}>',dataset.sentence.loc[x]))
+  # dataset['sentence'] = dataset['id'].apply(lambda x: re.sub(rf'{dataset.object_entity.loc[x]}',f'<{dataset.object_type.loc[x]}>',dataset.sentence.loc[x]))
+  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
   tokenized_sentences = tokenizer(
       concat_entity,
       list(dataset['sentence']),
@@ -61,3 +88,21 @@ def tokenized_dataset(dataset, tokenizer):
       add_special_tokens=True,
       )
   return tokenized_sentences
+
+# def tokenized_dataset(dataset, tokenizer):
+#   """ tokenizer에 따라 sentence를 tokenizing 합니다."""
+#   concat_entity = []
+#   for e01, e02 in zip(dataset['subject_entity'], dataset['object_entity']):
+#     temp = ''
+#     temp = e01 + '[SEP]' + e02
+#     concat_entity.append(temp)
+#   tokenized_sentences = tokenizer(
+#       concat_entity,
+#       list(dataset['sentence']),
+#       return_tensors="pt",
+#       padding=True,
+#       truncation=True,
+#       max_length=256,
+#       add_special_tokens=True,
+#       )
+#   return tokenized_sentences
