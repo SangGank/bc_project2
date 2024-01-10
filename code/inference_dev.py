@@ -58,6 +58,7 @@ def load_test_dataset(dataset_dir, tokenizer):
     tokenizing 합니다.
   """
   test_dataset = load_data(dataset_dir)
+  test_dataset.label =100
   test_label = list(map(int,test_dataset['label'].values))
   # tokenizing dataset
   tokenized_test = tokenized_dataset(test_dataset, tokenizer)
@@ -81,7 +82,7 @@ def main(args):
   model.to(device)
 
   ## load test datset
-  test_dataset_dir = "./data/dataset/test/test_data.csv"
+  test_dataset_dir = "./data/dataset/train/dev_no_half_arg_equal.csv"
   test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
   Re_test_dataset = RE_Dataset(test_dataset ,test_label)
 
@@ -94,7 +95,7 @@ def main(args):
   # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
   output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
 
-  output.to_csv(f'./code/prediction/{file_name}.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+  output.to_csv(f'./code/prediction/dev_{file_name}.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
   #### 필수!! ##############################################
   print('---- Finish! ----')
 if __name__ == '__main__':
