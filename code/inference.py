@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_changeword_metric'
+file_name = 'train_changeword_type'
 
 def inference(model, tokenized_sent, device):
   """

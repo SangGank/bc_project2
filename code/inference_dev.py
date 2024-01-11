@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_half_arg'
+file_name = 'train_type'
 
 def inference(model, tokenized_sent, device):
   """
@@ -82,7 +82,7 @@ def main(args):
   model.to(device)
 
   ## load test datset
-  test_dataset_dir = "./data/dataset/train/dev_no_half_arg_equal.csv"
+  test_dataset_dir = "./data/dataset/train/dev_type.csv"
   test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
   Re_test_dataset = RE_Dataset(test_dataset ,test_label)
 

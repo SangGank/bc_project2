@@ -72,11 +72,9 @@ def tokenized_dataset(dataset, tokenizer):
     temp = ''
     temp = e01 + '[SEP]' + e02
     concat_entity.append(temp)
-  # print(dataset.head())
-  dataset['sentence'] = dataset['id'].apply(lambda x: change_word(dataset.sentence.loc[x],dataset.subject_entity.loc[x],
-                                                                  dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
-  # dataset['sentence'] = dataset['id'].apply(lambda x: re.sub(rf'{dataset.subject_entity.loc[x]}',f'<{dataset.subject_type.loc[x]}>',dataset.sentence.loc[x]))
-  # dataset['sentence'] = dataset['id'].apply(lambda x: re.sub(rf'{dataset.object_entity.loc[x]}',f'<{dataset.object_type.loc[x]}>',dataset.sentence.loc[x]))
+  
+  # dataset['sentence'] = dataset['id'].apply(lambda x: change_word(dataset.sentence.loc[x],dataset.subject_entity.loc[x],
+  #                                                                 dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
   tokenized_sentences = tokenizer(
       concat_entity,
       list(dataset['sentence']),
