@@ -73,12 +73,16 @@ def main(args):
   # load tokenizer
   Tokenizer_NAME = "klue/bert-base"
   tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
+  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
+
 
   ## load my model
   MODEL_NAME = args.model_dir # model dir.
   print(MODEL_NAME)
   model = AutoModelForSequenceClassification.from_pretrained(args.model_dir)
   model.parameters
+  model.resize_token_embeddings(len(tokenizer))
+
   model.to(device)
 
   ## load test datset

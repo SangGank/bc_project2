@@ -9,6 +9,7 @@ from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassifi
 from load_data import *
 import numpy as np
 import random
+import pathlib
 
 os.environ['WANDB_PROJECT'] = 'project2'
 os.environ["WANDB_LOG_MODEL"] = "checkpoint"
@@ -92,8 +93,13 @@ def train():
   train_dataset_total = load_data("./data/dataset/train/train_totalX3.csv")
   dev_dataset_total = load_data("./data/dataset/train/dev_total.csv") # validation용 데이터는 따로 만드셔야 합니다.
 
-  for sub in train_dataset_total.subject_type.unique():
+  for sub in ['PER','ORG']:
     for ob in train_dataset_total.object_type.unique():
+      print(sub,ob)
+      file = pathlib.Path(f'./best_model/{wandb_name}_{ob}_{sub}')
+      if file.exists():
+         print(f'./best_model/{wandb_name}_{ob}_{sub}  exist')
+         continue
        
       train_dataset = train_dataset_total[(train_dataset_total.object_type == ob) & (train_dataset_total.subject_type == sub)]
       dev_dataset = dev_dataset_total[(dev_dataset_total.object_type == ob) & (dev_dataset_total.subject_type == sub)]

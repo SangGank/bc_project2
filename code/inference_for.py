@@ -74,38 +74,41 @@ def main(args):
   tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
 
-
-  ## load my model
-  MODEL_NAME = args.model_dir # model dir.
-  print(MODEL_NAME)
-  model = AutoModelForSequenceClassification.from_pretrained(args.model_dir)
-  model.parameters
-  model.to(device)
-  model.resize_token_embeddings(len(tokenizer))
-
-
+  file_list = os.listdir(args.model_dir)
+  
   ## load test datset
   test_dataset_dir = "./data/dataset/test/test_data.csv"
   test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
   Re_test_dataset = RE_Dataset(test_dataset ,test_label)
+  for file in file_list:
 
-  ## predict answer
-  pred_answer, output_prob = inference(model, Re_test_dataset, device) # model에서 class 추론
-  pred_answer = num_to_label(pred_answer) # 숫자로 된 class를 원래 문자열 라벨로 변환.
-  
-  ## make csv file with predicted answer
-  #########################################################
-  # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
-  output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
 
-  output.to_csv(f'./code/prediction/{file_name}.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+    ## load my model
+    MODEL_NAME = f'{args.model_dir}/{file}' # model dir.
+    print(MODEL_NAME)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+    model.parameters
+    model.to(device)
+    model.resize_token_embeddings(len(tokenizer))
+
+
+    ## predict answer
+    pred_answer, output_prob = inference(model, Re_test_dataset, device) # model에서 class 추론
+    pred_answer = num_to_label(pred_answer) # 숫자로 된 class를 원래 문자열 라벨로 변환.
+    
+    ## make csv file with predicted answer
+    #########################################################
+    # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
+    output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
+
+    output.to_csv(f'./code/prediction/{file}.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
   #### 필수!! ##############################################
   print('---- Finish! ----')
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   
   # model dir
-  parser.add_argument('--model_dir', type=str, default=f"./best_model/{file_name}")
+  parser.add_argument('--model_dir', type=str, default=f"./best_model")
   args = parser.parse_args()
   print(args)
   main(args)

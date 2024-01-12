@@ -192,6 +192,7 @@ results/
 wandb/
 prediction/
 best_model/
+bumm/
 *.csv
 a.py
 # End of https://www.toptal.com/developers/gitignore/api/linux,python
