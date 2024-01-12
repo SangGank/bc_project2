@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_dataX3'
+file_name = 'train_restart_type'
 
 def inference(model, tokenized_sent, device):
   """
@@ -71,6 +71,9 @@ def main(args):
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
   # load tokenizer
   Tokenizer_NAME = "klue/bert-base"
+  # Tokenizer_NAME = "klue/roberta-large"
+
+  
   tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
 
@@ -105,6 +108,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   
   # model dir
+  # parser.add_argument('--model_dir', type=str, default=f"./bumm/{file_name}")
   parser.add_argument('--model_dir', type=str, default=f"./best_model/{file_name}")
   args = parser.parse_args()
   print(args)

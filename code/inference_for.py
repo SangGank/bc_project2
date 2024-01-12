@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_dataX3'
+dir_name = 'train_restart_type'
 
 def inference(model, tokenized_sent, device):
   """
@@ -80,9 +80,11 @@ def main(args):
   test_dataset_dir = "./data/dataset/test/test_data.csv"
   test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
   Re_test_dataset = RE_Dataset(test_dataset ,test_label)
+  print(file_list)
   for file in file_list:
-
-
+    
+    if os.path.exists(f'./code/prediction/{dir_name}_{file}.csv'):
+      continue
     ## load my model
     MODEL_NAME = f'{args.model_dir}/{file}' # model dir.
     print(MODEL_NAME)
@@ -99,16 +101,18 @@ def main(args):
     ## make csv file with predicted answer
     #########################################################
     # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
-    output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
+    output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob})
 
-    output.to_csv(f'./code/prediction/{file}.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+    output.to_csv(f'./code/prediction/{dir_name}_{file}.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
   #### 필수!! ##############################################
   print('---- Finish! ----')
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   
   # model dir
-  parser.add_argument('--model_dir', type=str, default=f"./best_model")
+  # parser.add_argument('--model_dir', type=str, default=f"./best_model")
+  parser.add_argument('--model_dir', type=str, default=f"./code/results/{dir_name}")
+
   args = parser.parse_args()
   print(args)
   main(args)
