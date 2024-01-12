@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_type'
+file_name = 'train_dataX3'
 
 def inference(model, tokenized_sent, device):
   """
@@ -82,7 +82,7 @@ def main(args):
   model.to(device)
 
   ## load test datset
-  test_dataset_dir = "./data/dataset/train/dev_type.csv"
+  test_dataset_dir = "./data/dataset/train/dev_total.csv"
   test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
   Re_test_dataset = RE_Dataset(test_dataset ,test_label)
 
@@ -101,6 +101,7 @@ def main(args):
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   
+
   # model dir
   parser.add_argument('--model_dir', type=str, default=f"./best_model/{file_name}")
   args = parser.parse_args()
