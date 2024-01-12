@@ -89,8 +89,8 @@ def train():
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
 
   # load dataset
-  train_dataset = load_data("./data/dataset/train/train_type.csv")
-  dev_dataset = load_data("./data/dataset/train/dev_type.csv") # validation용 데이터는 따로 만드셔야 합니다.
+  train_dataset = load_data("./data/dataset/train/train_type2.csv")
+  dev_dataset = load_data("./data/dataset/train/dev_type2.csv") # validation용 데이터는 따로 만드셔야 합니다.
 
   train_label = label_to_num(train_dataset['label'].values)
   dev_label = label_to_num(dev_dataset['label'].values)
