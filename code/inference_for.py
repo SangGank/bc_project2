@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-dir_name = 'train_restart_type'
+dir_name = 'train_restart_type3'
 
 def inference(model, tokenized_sent, device):
   """
@@ -83,8 +83,8 @@ def main(args):
   print(file_list)
   for file in file_list:
     
-    if os.path.exists(f'./code/prediction/{dir_name}_{file}.csv'):
-      continue
+    # if os.path.exists(f'./code/prediction/{dir_name}_{file}.csv'):
+    #   continue
     ## load my model
     MODEL_NAME = f'{args.model_dir}/{file}' # model dir.
     print(MODEL_NAME)

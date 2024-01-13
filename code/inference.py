@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_restart_type'
+file_name = 'train_restart_type500'
 
 def inference(model, tokenized_sent, device):
   """
