@@ -74,7 +74,9 @@ def main(args):
   # load tokenizer
   Tokenizer_NAME = "klue/bert-base"
   tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
-  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
+  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
+                                                               '<s. PER>', '<s. ORG>', '<s. DAT>', '<s. LOC>', '<s. POH>', '<s. NOH>',
+                                                               '<o. PER>', '<o. ORG>', '<o. DAT>', '<o. LOC>', '<o. POH>', '<o. NOH>']})
 
 
   test_dataset_dir = "./data/dataset/train/dev_total.csv"

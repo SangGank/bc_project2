@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_num2'
+file_name = 'train_14'
 
 def inference(model, tokenized_sent, device):
   """
@@ -61,7 +61,7 @@ def load_test_dataset(dataset_dir, tokenizer):
   test_dataset.label =100
   test_label = list(map(int,test_dataset['label'].values))
   # tokenizing dataset
-  tokenized_test = tokenized_dataset2(test_dataset, tokenizer)
+  tokenized_test = tokenized_dataset14(test_dataset, tokenizer)
   return test_dataset['id'], tokenized_test, test_label
 
 def main(args):
@@ -73,7 +73,9 @@ def main(args):
   # load tokenizer
   Tokenizer_NAME = "klue/bert-base"
   tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
-  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
+  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
+                                                               '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
+                                                               '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>']})
 
 
   ## load my model
@@ -86,7 +88,7 @@ def main(args):
   model.to(device)
 
   ## load test datset
-  test_dataset_dir = "./data/dataset/train/dev_total.csv"
+  test_dataset_dir = "./data/dataset/train/dev_type.csv"
   test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
   Re_test_dataset = RE_Dataset(test_dataset ,test_label)
 
