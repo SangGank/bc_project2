@@ -86,7 +86,8 @@ def preprocessing_dataset(dataset):
     object_end.append(ob_end)
   
   out_dataset = pd.DataFrame({'id':dataset['id'], 'sentence':dataset['sentence'],'subject_entity':subject_entity,'object_entity':object_entity,'label':dataset['label'],
-                              'subject_type' : subject_type, 'object_type': object_type,'sub_start' : subject_start,'ob_start':object_start,'sub_end' :subject_end ,'ob_end': object_end})
+                              'subject_type' : subject_type, 'object_type': object_type,'sub_start' : subject_start,'ob_start':object_start,'sub_end' :subject_end ,
+                              'ob_end': object_end,'source':dataset['source']})
   out_dataset.id = out_dataset.index
   return out_dataset
 
@@ -285,6 +286,29 @@ def tokenized_dataset14(dataset, tokenizer):
   dataset['sentence'] = dataset['id'].apply(lambda x: change_sentence3(dataset.sentence.loc[x],dataset.subject_entity.loc[x],
                                                                   dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
 
+  tokenized_sentences = tokenizer(
+      concat_entity,
+      list(dataset['sentence']),
+      return_tensors="pt",
+      padding=True,
+      truncation=True,
+      max_length=256,
+      add_special_tokens=True,
+      )
+  return tokenized_sentences
+
+def tokenized_dataset15(dataset, tokenizer):
+  """ tokenizer에 따라 sentence를 tokenizing 합니다."""
+
+  concat_entity = []
+  for e01, e02, t01, t02, source in zip(dataset['subject_entity'], dataset['object_entity'],dataset['subject_type'] ,dataset['object_type'], dataset['source']):
+    temp = ''
+    temp =  f'<s> {e01} <S. {t01}> </s>' + ' [SEP] ' + f'<o> {e02} <O. {t02}> </o> [SEP] <{source}>'
+
+    concat_entity.append(temp)
+  
+  dataset['sentence'] = dataset['id'].apply(lambda x: change_sentence3(dataset.sentence.loc[x],dataset.subject_entity.loc[x],
+                                                                  dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
   tokenized_sentences = tokenizer(
       concat_entity,
       list(dataset['sentence']),

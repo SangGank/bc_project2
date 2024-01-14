@@ -15,9 +15,6 @@ os.environ["WANDB_LOG_MODEL"] = "checkpoint"
 file_name = os.path.basename(__file__).split('.')[0]
 wandb_name = file_name
 
-
-# alpha= np.array([0]*30)
-
 def set_seed(seed:int = 42):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -79,49 +76,19 @@ def label_to_num(label):
   with open('./code/dict_label_to_num.pkl', 'rb') as f:
     dict_label_to_num = pickle.load(f)
   for v in label:
-    change_index = dict_label_to_num[v]
-    num_label.append(change_index)
-  #   alpha[change_index] += 1
-  # print((1/alpha*10).tolist())
+    num_label.append(dict_label_to_num[v])
   
   return num_label
-
-class CustomTrainer(Trainer):
-    def compute_loss(self, model, inputs, return_outputs=False):
-        
-        labels = inputs.pop("labels")
-        
-        outputs = model(**inputs)
-        logits = outputs.logits
-
-#         # calculate focal loss
-        alpha =[0.0010592098294672173, 0.0023446658851113715, 0.023923444976076555, 0.026595744680851064, 0.004789272030651341, 0.007621951219512195, 
-                0.002813731007315701, 0.008424599831508003, 0.07407407407407407, 0.23255813953488372, 0.033112582781456956, 0.05263157894736842, 0.010030090270812437, 
-                0.05263157894736842, 0.018832391713747645, 0.008176614881439084, 0.07352941176470588, 0.012594458438287152, 0.02252252252252252, 0.10309278350515463,
-                  0.005387931034482759, 0.019305019305019305, 0.15151515151515152, 0.12195121951219512, 0.02403846153846154, 
-                0.008952551477170993, 0.06134969325153374, 0.25, 0.06451612903225806, 0.10638297872340426]
-        
-        alpha = torch.tensor(alpha).to(torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'))*300
-        gamma = 2.0
-
-        ce_loss = torch.nn.functional.cross_entropy(logits, labels, reduction='none')
-        pt = torch.exp(-ce_loss)
-        focal_loss = alpha[labels] * (1-pt)**gamma * ce_loss
-
-        loss = torch.mean(focal_loss)
-
-        return (loss, outputs) if return_outputs else loss
-    
 
 def train():
   set_seed(42)
   # load model and tokenizer
-  # MODEL_NAME = "bert-base-uncased"
-  MODEL_NAME = "klue/bert-base"
+  MODEL_NAME = "klue/roberta-base"
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
-                                                               '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
-                                                               '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>']})
+                                                                '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
+                                                                '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>',
+                                                                '<wikipedia>', '<wikitree>', '<policy_briefing>']})
 
   # load dataset
   train_dataset = load_data("./data/dataset/train/train_type.csv")
@@ -131,8 +98,8 @@ def train():
   dev_label = label_to_num(dev_dataset['label'].values)
 
   # tokenizing dataset
-  tokenized_train = tokenized_dataset14(train_dataset, tokenizer)
-  tokenized_dev = tokenized_dataset14(dev_dataset, tokenizer)
+  tokenized_train = tokenized_dataset15(train_dataset, tokenizer)
+  tokenized_dev = tokenized_dataset15(dev_dataset, tokenizer)
 
   # make dataset for pytorch.
   RE_train_dataset = RE_Dataset(tokenized_train, train_label)
@@ -142,13 +109,11 @@ def train():
 
   print(device)
   # setting model hyperparameter
-  # model_config =  AutoConfig.from_pretrained(MODEL_NAME)
-  # model_config.num_labels = 30
+  model_config =  AutoConfig.from_pretrained(MODEL_NAME)
+  model_config.num_labels = 30
 
-  model = AutoModelForSequenceClassification.from_pretrained(f"./best_model/{file_name}")
-
-  # model =  AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, config=model_config)
-  # model.resize_token_embeddings(len(tokenizer))
+  model =  AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, config=model_config)
+  model.resize_token_embeddings(len(tokenizer))
   print(model.config)
   model.parameters
   model.to(device)
@@ -177,7 +142,7 @@ def train():
     run_name=wandb_name,
     metric_for_best_model='micro f1 score'
   )
-  trainer = CustomTrainer(
+  trainer = Trainer(
     model=model,                         # the instantiated 🤗 Transformers model to be trained
     args=training_args,                  # training arguments, defined above
     train_dataset=RE_train_dataset,         # training dataset
@@ -192,7 +157,6 @@ def train():
   model.save_pretrained(f'./best_model/{wandb_name}')
 def main():
   train()
-  
 
 if __name__ == '__main__':
   main()

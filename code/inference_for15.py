@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-dir_name = 'train_9_200.'
+dir_name = 'train_15_roberta'
 
 def inference(model, tokenized_sent, device):
   """
@@ -60,7 +60,7 @@ def load_test_dataset(dataset_dir, tokenizer):
   test_dataset = load_data(dataset_dir)
   test_label = list(map(int,test_dataset['label'].values))
   # tokenizing dataset
-  tokenized_test = tokenized_dataset14(test_dataset, tokenizer)
+  tokenized_test = tokenized_dataset15(test_dataset, tokenizer)
   return test_dataset['id'], tokenized_test, test_label
 
 def main(args):
@@ -70,13 +70,14 @@ def main(args):
   """
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
   # load tokenizer
-  Tokenizer_NAME = "klue/bert-base"
-  # Tokenizer_NAME = "klue/roberta-base"
+  # Tokenizer_NAME = "klue/bert-base"
+  Tokenizer_NAME = "klue/roberta-base"
 
   tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
                                                                '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
-                                                               '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>']})
+                                                               '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>',
+                                                               '<wikipedia>', '<wikitree>', '<policy_briefing>']})
 
   file_list = os.listdir(args.model_dir)
   

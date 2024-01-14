@@ -101,7 +101,7 @@ class CustomTrainer(Trainer):
                   0.005387931034482759, 0.019305019305019305, 0.15151515151515152, 0.12195121951219512, 0.02403846153846154, 
                 0.008952551477170993, 0.06134969325153374, 0.25, 0.06451612903225806, 0.10638297872340426]
         
-        alpha = torch.tensor(alpha).to(torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'))*300
+        alpha = torch.tensor(alpha).to(torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'))*200
         gamma = 2.0
 
         ce_loss = torch.nn.functional.cross_entropy(logits, labels, reduction='none')
