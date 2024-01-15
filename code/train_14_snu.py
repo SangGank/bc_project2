@@ -5,7 +5,7 @@ import torch
 import sklearn
 import numpy as np
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
-from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments, RobertaConfig, RobertaTokenizer, RobertaForSequenceClassification, BertTokenizer, EarlyStoppingCallback
+from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, Trainer, TrainingArguments, RobertaConfig, RobertaTokenizer, RobertaForSequenceClassification, BertTokenizer, EarlyStoppingCallback, ElectraTokenizer,ElectraForSequenceClassification
 from load_data import *
 import numpy as np
 import random
@@ -84,7 +84,7 @@ def train():
   set_seed(42)
   # load model and tokenizer
   # MODEL_NAME = "bert-base-uncased"
-  MODEL_NAME = "klue/bert-base"
+  MODEL_NAME = "snunlp/KR-ELECTRA-discriminator"
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
                                                                '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',

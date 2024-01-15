@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-dir_name = 'train_9_200.'
+dir_name = 'train_roberta_large'
 
 def inference(model, tokenized_sent, device):
   """
@@ -60,7 +60,7 @@ def load_test_dataset(dataset_dir, tokenizer):
   test_dataset = load_data(dataset_dir)
   test_label = list(map(int,test_dataset['label'].values))
   # tokenizing dataset
-  tokenized_test = tokenized_dataset14(test_dataset, tokenizer)
+  tokenized_test = tokenized_dataset(test_dataset, tokenizer)
   return test_dataset['id'], tokenized_test, test_label
 
 def main(args):
@@ -70,8 +70,8 @@ def main(args):
   """
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
   # load tokenizer
-  Tokenizer_NAME = "klue/bert-base"
-  # Tokenizer_NAME = "klue/roberta-base"
+  # Tokenizer_NAME = "klue/bert-base"
+  Tokenizer_NAME = "klue/roberta-large"
 
   tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',

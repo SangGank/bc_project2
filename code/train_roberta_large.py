@@ -84,11 +84,9 @@ def train():
   set_seed(42)
   # load model and tokenizer
   # MODEL_NAME = "bert-base-uncased"
-  MODEL_NAME = "klue/bert-base"
+  MODEL_NAME = "klue/roberta-large"
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
-                                                               '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
-                                                               '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>']})
+  tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>']})
 
   # load dataset
   train_dataset = load_data("./data/dataset/train/train_type.csv")
@@ -98,8 +96,8 @@ def train():
   dev_label = label_to_num(dev_dataset['label'].values)
 
   # tokenizing dataset
-  tokenized_train = tokenized_dataset14(train_dataset, tokenizer)
-  tokenized_dev = tokenized_dataset14(dev_dataset, tokenizer)
+  tokenized_train = tokenized_dataset(train_dataset, tokenizer)
+  tokenized_dev = tokenized_dataset(dev_dataset, tokenizer)
 
   # make dataset for pytorch.
   RE_train_dataset = RE_Dataset(tokenized_train, train_label)

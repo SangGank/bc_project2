@@ -76,13 +76,10 @@ def main(args):
 
   
   tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
-  # tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
-  #                                                              '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
-  #                                                              '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>',
-  #                                                              '<wikipedia>', '<wikitree>', '<policy_briefing>']})
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
-                                                                '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
-                                                                '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>']})
+                                                               '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
+                                                               '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>',
+                                                               '<wikipedia>', '<wikitree>', '<policy_briefing>']})
 
   ## load my model
   MODEL_NAME = args.model_dir # model dir.

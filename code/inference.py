@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_9'
+file_name = 'train_14_snu'
 
 def inference(model, tokenized_sent, device):
   """
@@ -70,8 +70,10 @@ def main(args):
   """
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
   # load tokenizer
-  Tokenizer_NAME = "klue/bert-base"
+  # Tokenizer_NAME = "klue/bert-base"
   # Tokenizer_NAME = "klue/roberta-base"
+  Tokenizer_NAME = "snunlp/KR-ELECTRA-discriminator"
+
 
 
   
