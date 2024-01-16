@@ -18,6 +18,22 @@ class RE_Dataset(torch.utils.data.Dataset):
 
   def __len__(self):
     return len(self.labels)
+  
+class RE_Dataset2(torch.utils.data.Dataset):
+  """ Dataset 구성을 위한 class."""
+  def __init__(self, pair_dataset, labels):
+    self.pair_dataset = pair_dataset
+    self.labels = labels
+
+  def __getitem__(self, idx):
+    # item = {key: val[idx].clone().detach() for key, val in self.pair_dataset.items()}
+    item = {'input_ids' : self.pair_dataset['input_ids'][idx].clone().detach,
+            'attention_mask': self.pair_dataset['attention_mask'][idx].clone().detach}
+    item['labels'] = torch.tensor(self.labels[idx])
+    return item
+
+  def __len__(self):
+    return len(self.labels)
 
 # def preprocessing_dataset(dataset):
 #   """ 처음 불러온 csv 파일을 원하는 형태의 DataFrame으로 변경 시켜줍니다."""
@@ -186,6 +202,13 @@ def change_sentence3(sentence, sub_word, sub_type , ob_word, ob_type):
 
   return sentence
 
+def change_sentence4(sentence, sub_word, sub_type , ob_word, ob_type):
+  sentence = re.sub(rf'{sub_word}',f' @ * <S. {sub_type}> * {sub_word} ',sentence)
+  sentence = re.sub(rf'{ob_word}',f' # ^ <O. {ob_type}> ^ {ob_word} ',sentence)
+
+  return sentence
+
+
 
 
 
@@ -319,3 +342,103 @@ def tokenized_dataset15(dataset, tokenizer):
       add_special_tokens=True,
       )
   return tokenized_sentences
+
+
+
+def tokenized_dataset16(dataset, tokenizer):
+  """ tokenizer에 따라 sentence를 tokenizing 합니다."""
+  concat_entity = []
+  for e01, e02, t01, t02 in zip(dataset['subject_entity'], dataset['object_entity'],dataset['subject_type'] ,dataset['object_type']):
+    temp = ''
+    temp =  f'@ * <S. {t01}> * {e01}과 # ^ <O. {t02}> ^ {e02} 사이의 관계는 무엇인가?'
+
+    concat_entity.append(temp)
+  
+  dataset['sentence'] = dataset['id'].apply(lambda x: change_sentence3(dataset.sentence.loc[x],dataset.subject_entity.loc[x],
+                                                                  dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
+
+  tokenized_sentences = tokenizer(
+      concat_entity,
+      list(dataset['sentence']),
+      return_tensors="pt",
+      padding=True,
+      truncation=True,
+      max_length=256,
+      add_special_tokens=True,
+      )
+  return tokenized_sentences
+
+
+
+def tokenized_dataset17(dataset, tokenizer):
+  """ tokenizer에 따라 sentence를 tokenizing 합니다."""
+  concat_entity = []
+  for e01, e02, t01, t02 in zip(dataset['subject_entity'], dataset['object_entity'],dataset['subject_type'] ,dataset['object_type']):
+    temp = ''
+    temp =  f'@ * <S. {t01}> * {e01}과 # ^ <O. {t02}> ^ {e02} 사이의 관계는 무엇인가?'
+
+    concat_entity.append(temp)
+
+  tokenized_sentences = tokenizer(
+      concat_entity,
+      list(dataset['sentence']),
+      return_tensors="pt",
+      padding=True,
+      truncation=True,
+      max_length=256,
+      add_special_tokens=True,
+      )
+  return tokenized_sentences
+
+
+
+
+def tokenized_dataset18(dataset, tokenizer):
+  """ tokenizer에 따라 sentence를 tokenizing 합니다."""
+  concat_entity = []
+  for e01, e02, t01, t02 in zip(dataset['subject_entity'], dataset['object_entity'],dataset['subject_type'] ,dataset['object_type']):
+    temp = ''
+    temp =  f'@ * <S. {t01}> * {e01}과 # ^ <O. {t02}> ^ {e02} 사이의 관계는 무엇인가?'
+
+    concat_entity.append(temp)
+  
+  dataset['sentence'] = dataset['id'].apply(lambda x: change_sentence4(dataset.sentence.loc[x],dataset.subject_entity.loc[x],
+                                                                  dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
+
+  tokenized_sentences = tokenizer(
+      concat_entity,
+      list(dataset['sentence']),
+      return_tensors="pt",
+      padding=True,
+      truncation=True,
+      max_length=256,
+      add_special_tokens=True,
+      )
+  return tokenized_sentences
+
+
+def tokenized_dataset19(dataset, tokenizer):
+
+  """ tokenizer에 따라 sentence를 tokenizing 합니다."""
+  change_type = {'PER' : '사람', 'ORG': '조직', 'DAT':'날짜', 'LOC': '지역', 'POH' : '대체어', 'NOH' : '숫자'}
+  concat_entity = []
+  for e01, e02, t01, t02 in zip(dataset['subject_entity'], dataset['object_entity'],dataset['subject_type'] ,dataset['object_type']):
+    temp = ''
+    temp =  f'{e01}와 {e02}의 관계는 {change_type[t01]}와 {change_type[t02]}의 관계이다.'
+
+    concat_entity.append(temp)
+  
+  dataset['sentence'] = dataset['id'].apply(lambda x: change_sentence4(dataset.sentence.loc[x],dataset.subject_entity.loc[x],
+                                                                  dataset.subject_type.loc[x],dataset.object_entity.loc[x], dataset.object_type.loc[x]))
+
+  tokenized_sentences = tokenizer(
+      concat_entity,
+      list(dataset['sentence']),
+      return_tensors="pt",
+      padding=True,
+      truncation=True,
+      max_length=256,
+      add_special_tokens=True,
+      )
+  return tokenized_sentences
+

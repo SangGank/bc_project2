@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_14_snu'
+file_name = 'train_18_roberta-large'
 
 def inference(model, tokenized_sent, device):
   """
@@ -60,7 +60,7 @@ def load_test_dataset(dataset_dir, tokenizer):
   test_dataset = load_data(dataset_dir)
   test_label = list(map(int,test_dataset['label'].values))
   # tokenizing dataset
-  tokenized_test = tokenized_dataset14(test_dataset, tokenizer)
+  tokenized_test = tokenized_dataset18(test_dataset, tokenizer)
   return test_dataset['id'], tokenized_test, test_label
 
 def main(args):
@@ -71,8 +71,8 @@ def main(args):
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
   # load tokenizer
   # Tokenizer_NAME = "klue/bert-base"
-  # Tokenizer_NAME = "klue/roberta-base"
-  Tokenizer_NAME = "snunlp/KR-ELECTRA-discriminator"
+  Tokenizer_NAME = "klue/roberta-large"
+  # Tokenizer_NAME = "snunlp/KR-ELECTRA-discriminator"
 
 
 
