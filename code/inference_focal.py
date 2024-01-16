@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_14'
+file_name = 'train_19_lr_change'
 
 def inference(model, tokenized_sent, device):
   """
@@ -60,7 +60,7 @@ def load_test_dataset(dataset_dir, tokenizer):
   test_dataset = load_data(dataset_dir)
   test_label = list(map(int,test_dataset['label'].values))
   # tokenizing dataset
-  tokenized_test = tokenized_dataset14(test_dataset, tokenizer)
+  tokenized_test = tokenized_dataset19(test_dataset, tokenizer)
   return test_dataset['id'], tokenized_test, test_label
 
 def main(args):
