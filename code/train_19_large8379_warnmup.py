@@ -9,21 +9,9 @@ from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassifi
 from load_data import *
 import numpy as np
 import random
-import wandb
-from datetime import datetime
 
-# 현재 날짜와 시간을 얻습니다.
-current_datetime = datetime.now()
-
-# strftime 메서드를 사용하여 원하는 형식의 문자열로 변환합니다.
-# 예: YYYY-MM-DD HH:MM:SS
-formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
-
-print("현재 날짜와 시간:", formatted_datetime)
-
-
-# os.environ['WANDB_PROJECT'] = 'project2'
-# os.environ["WANDB_LOG_MODEL"] = "checkpoint"
+os.environ['WANDB_PROJECT'] = 'project2'
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"
 file_name = os.path.basename(__file__).split('.')[0]
 wandb_name = file_name
 
@@ -94,17 +82,12 @@ def label_to_num(label):
 
 def train():
   set_seed(42)
-
   # load model and tokenizer
   MODEL_NAME = "klue/roberta-large"
-  # MODEL_NAME = "klue/bert-base"
-  
-
   tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
   tokenizer.add_special_tokens({ "additional_special_tokens": ['<PER>', '<ORG>', '<DAT>', '<LOC>', '<POH>', '<NOH>','<s>','</s>','<o>','</o>',
                                                               '<S. PER>', '<S. ORG>', '<S. DAT>', '<S. LOC>', '<S. POH>', '<S. NOH>',
                                                               '<O. PER>', '<O. ORG>', '<O. DAT>', '<O. LOC>', '<O. POH>', '<O. NOH>']})
-  
 
   # load dataset
   train_dataset = load_data("./data/dataset/train/train_type.csv")
@@ -124,78 +107,57 @@ def train():
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
   print(device)
+  # setting model hyperparameter
+  model_config =  AutoConfig.from_pretrained(MODEL_NAME)
+  model_config.num_labels = 30
+
+  model =  AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, config=model_config)
+  model.resize_token_embeddings(len(tokenizer))
+  print(model.config)
+  model.parameters
+  model.to(device)
 
   
-  with wandb.init():
-    # set sweep configuration
-    config = wandb.config
-  # setting model hyperparameter
-    model_config =  AutoConfig.from_pretrained(MODEL_NAME)
-    model_config.num_labels = 30
+  
+  # 사용한 option 외에도 다양한 option들이 있습니다.
+  # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments 참고해주세요.
+  training_args = TrainingArguments(
+    output_dir=f'./code/results/{wandb_name}',          # output directory
+    save_total_limit=4,              # number of total save model.
+    save_steps=1000,                 # model saving step.
+    num_train_epochs=4,              # total number of training epochs
+    learning_rate=0.8379e-5,               # learning_rate
+    per_device_train_batch_size=16,  # batch size per device during training
+    per_device_eval_batch_size=16,   # batch size for evaluation
+    warmup_steps=500,                # number of warmup steps for learning rate scheduler
+    # weight_decay=0.01,               # strength of weight decay
+    logging_dir='./logs',            # directory for storing logs
+    logging_steps=100,              # log saving step.
+    evaluation_strategy='steps', # evaluation strategy to adopt during training
+                                # `no`: No evaluation during training.
+                                # `steps`: Evaluate every `eval_steps`.
+                                # `epoch`: Evaluate every end of epoch.
+    eval_steps = 1000,            # evaluation step.
+    load_best_model_at_end = True,
+    report_to="wandb",
+    run_name=wandb_name,
+    metric_for_best_model='micro f1 score'
+  )
+  trainer = Trainer(
+    model=model,                         # the instantiated 🤗 Transformers model to be trained
+    args=training_args,                  # training arguments, defined above
+    train_dataset=RE_train_dataset,         # training dataset
+    eval_dataset=RE_dev_dataset,             # evaluation dataset
+    compute_metrics=compute_metrics,         # define metrics function
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=5)]
     
+  )
 
-    model =  AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, config=model_config)
-    model.resize_token_embeddings(len(tokenizer))
-    print(model.config)
-    model.parameters
-    model.to(device)
-
-
-    
-    # 사용한 option 외에도 다양한 option들이 있습니다.
-    # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments 참고해주세요.
-    training_args = TrainingArguments(
-      output_dir=f'./code/results/{wandb_name}',          # output directory
-      save_total_limit=5,              # number of total save model.
-      # save_steps=1000,                 # model saving step.
-      num_train_epochs=config.num_train_epochs,              # total number of training epochs
-      learning_rate=config.learning_rate,               # learning_rate
-      per_device_train_batch_size=16,  # batch size per device during training
-      per_device_eval_batch_size=16,   # batch size for evaluation
-      warmup_steps=500,                # number of warmup steps for learning rate scheduler
-      weight_decay=0.01,               # strength of weight decay
-      logging_dir='./logs',            # directory for storing logs
-      logging_steps=100,              # log saving step.
-      evaluation_strategy='epoch', # evaluation strategy to adopt during training
-                                  # `no`: No evaluation during training.
-                                  # `steps`: Evaluate every `eval_steps`.
-                                  # `epoch`: Evaluate every end of epoch.
-      # eval_steps = 1000,            # evaluation step.
-      save_strategy='epoch',
-
-      load_best_model_at_end = True,
-      report_to="wandb",
-      run_name=wandb_name+formatted_datetime,
-      metric_for_best_model='micro f1 score'
-    )
-    trainer = Trainer(
-      model=model,                         # the instantiated 🤗 Transformers model to be trained
-      args=training_args,                  # training arguments, defined above
-      train_dataset=RE_train_dataset,         # training dataset
-      eval_dataset=RE_dev_dataset,             # evaluation dataset
-      compute_metrics=compute_metrics,         # define metrics function
-      callbacks = [EarlyStoppingCallback(early_stopping_patience=5)]
-      
-    )
-
-    # train model
-    trainer.train()
+  # train model
+  trainer.train()
   model.save_pretrained(f'./best_model/{wandb_name}')
 def main():
-  # train()
-
-  sweep_config = {
-      "name": file_name,
-      "method": "bayes",
-      "metric": {"goal": "maximize", "name": "eval/micro f1 score"},
-      "parameters": {
-          "num_train_epochs": {"min": 3, "max": 5},
-          "learning_rate": {"min": 5e-6, "max": 2e-5}
-      }
-  }
-  
-  sweep_id = wandb.sweep(sweep=sweep_config, project="project2")
-  wandb.agent(sweep_id, function=train, count=10)
+  train()
 
 if __name__ == '__main__':
   main()
