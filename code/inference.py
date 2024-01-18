@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_19_roberta-large8379'
+file_name = 'train_19_seed_53'
 
 def inference(model, tokenized_sent, device):
   """
@@ -64,7 +64,7 @@ def load_test_dataset(dataset_dir, tokenizer):
   return test_dataset['id'], tokenized_test, test_label
 
 def main(args):
-  set_seed(42)
+  set_seed(43)
   """
     주어진 dataset csv 파일과 같은 형태일 경우 inference 가능한 코드입니다.
   """
@@ -106,7 +106,7 @@ def main(args):
   # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
   output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
 
-  output.to_csv(f'./code/prediction/{file_name}.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+  output.to_csv(f'./code/prediction/{file_name}_seed.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
   #### 필수!! ##############################################
   print('---- Finish! ----')
 if __name__ == '__main__':
