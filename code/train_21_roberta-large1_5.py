@@ -129,8 +129,8 @@ def train():
     learning_rate=1.5e-5,               # learning_rate
     per_device_train_batch_size=16,  # batch size per device during training
     per_device_eval_batch_size=16,   # batch size for evaluation
-    # warmup_steps=500,                # number of warmup steps for learning rate scheduler
-    # weight_decay=0.01,               # strength of weight decay
+    warmup_steps=500,                # number of warmup steps for learning rate scheduler
+    weight_decay=0.01,               # strength of weight decay
     logging_dir='./logs',            # directory for storing logs
     logging_steps=100,              # log saving step.
     evaluation_strategy='steps', # evaluation strategy to adopt during training

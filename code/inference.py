@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from train import set_seed
 
-file_name = 'train_19_seed_53'
+file_name = 'train_21_roberta-large1_5'
 
 def inference(model, tokenized_sent, device):
   """
